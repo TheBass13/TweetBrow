@@ -8,13 +8,22 @@ import android.widget.Toast;
 import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
+import com.tweetbrow.rcdsm.tweetbrow.Manager.UserManager;
+import com.tweetbrow.rcdsm.tweetbrow.Models.Tweet;
 import com.tweetbrow.rcdsm.tweetbrow.Models.User;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+
+import io.realm.Realm;
 
 
 /**
@@ -24,6 +33,7 @@ public class ClientAPI {
 
     private Context context;
     private AQuery aq;
+    protected Realm realm;
     private static ClientAPI instance;
     private SharedPreferences.Editor editor;
     private SharedPreferences preferences;
@@ -53,6 +63,7 @@ public class ClientAPI {
         Map<String, String> params = new HashMap<String, String>();
         params.put("login", login);
         params.put("password", password);
+        params.put("email",login);
 
         aq.ajax(url, params, JSONObject.class, new AjaxCallback<JSONObject>() {
 
@@ -61,9 +72,13 @@ public class ClientAPI {
 
                 if (json != null) {
                     User user = User.getInstance();
-                    user.setEmail(login);
+                    UserManager userManager = new UserManager(context);
                     try {
+                        user.setLogin(json.getJSONObject("data").getString("login"));
+                        user.setEmail(json.getJSONObject("data").getString("email"));
+                        user.setPseudo(json.getJSONObject("data").getString("pseudo"));
                         user.setToken(json.getJSONObject("data").getString("token"));
+                        userManager.userConnected(user);
 
                         if (preferences.contains("Token") == false) {
                             editor = preferences.edit();
@@ -71,7 +86,11 @@ public class ClientAPI {
                             editor.commit();
                         }
 
+                        Log.e("Login", user.getLogin());
+                        Log.e("Email", user.getEmail());
+                        Log.e("Pseudo", user.getPseudo());
                         Log.e("Token", user.getToken());
+
                         user.setSucces(json.getString("reponse"));
                         Log.e("Note", json.getString("reponse").toString());
                     } catch (JSONException e) {
@@ -80,7 +99,7 @@ public class ClientAPI {
                     //successful ajax call, show status code and json content
                     //Toast.makeText(aq.getContext(), status.getCode() + ":" + json.toString(), Toast.LENGTH_LONG).show();
                     if (user.isSucces().equals("success")) {
-                        Toast.makeText(aq.getContext(), "Welcom : " + login, Toast.LENGTH_LONG).show();
+                        Toast.makeText(aq.getContext(), "Welcom : " + user.getPseudo(), Toast.LENGTH_LONG).show();
                         _listener.callback();
                     } else {
                         Toast.makeText(aq.getContext(), "Email or Password is wrong !", Toast.LENGTH_LONG).show();
@@ -94,56 +113,78 @@ public class ClientAPI {
         });
     }
 
-        public void subscrib(final String email,final String password,final String confirmPassword,APIListener listener){
-
-        //On crée un JSOnObject et on recupère les informations email/password
-        JSONObject requete = new JSONObject();
-        //Puis on crée un deuxième JSONObject user ou l'on va mettre les informations recuperé précedement
-        JSONObject user = new JSONObject();
+    public void deleteTweet(String tweetID,String token,APIListener listener){
 
         final APIListener _listener = listener;
+        preferences = context.getSharedPreferences("Login", Context.MODE_PRIVATE);
+        JSONObject tweet = new JSONObject();
 
-        Log.i("Note", requete.toString());
-
-        try {
-            user.putOpt("email",email);
-            user.putOpt("password",password);
-
-            requete.putOpt("user", user);
-            Log.i("Note", requete.toString());
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("token", token);
+        params.put("tweet_id", tweetID);
 
         aq = new AQuery(context);
-        String url = "http://notes.lloyd66.fr/api/v1/user/";
-        aq.post(url, requete, JSONObject.class, new AjaxCallback<JSONObject>() {
+        String url = "http://172.31.1.120:8888/tweetbrow/tweet/delete";
+        aq.ajax(url, params, JSONObject.class, new AjaxCallback<JSONObject>() {
 
             @Override
             public void callback(String url, JSONObject json, AjaxStatus status) {
-
                 User user = User.getInstance();
-                user.setEmail(email);
-                user.setStatus(status.getCode());
                 try {
                     user.setSucces(json.getString("reponse"));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                //successful ajax call, show status code and json content
-                //Toast.makeText(aq.getContext(), status.getCode() + ":" + json.toString(), Toast.LENGTH_LONG).show();
-                if (confirmPassword.equals(password)) {
-                    if (user.isSucces().equals("success")) {
-                        connect(email, password, _listener);
-                    } else {
-                        Toast.makeText(aq.getContext(), "User already exist !", Toast.LENGTH_LONG).show();
-                    }
-                } else {
-                    Toast.makeText(aq.getContext(), "The confirm password is wrong !", Toast.LENGTH_LONG).show();
+                if (user.isSucces().equals("success")) {
+                    Log.e("TAG", "Delete tweet : ");
+                    _listener.callback();
                 }
             }
         });
+    }
+
+    public ArrayList<Tweet> takeTweet(String token,APIListener listener){
+
+        final ArrayList<Tweet> listTweet = new ArrayList<Tweet>();
+        final APIListener _listener = listener;
+        preferences = context.getSharedPreferences("Login", Context.MODE_PRIVATE);
+        realm = Realm.getInstance(context);
+
+        aq = new AQuery(context);
+        String url = "http://lyber.local:8888/tweetbrow/timeline";
+
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("token", token);
+
+        Log.i("URL",url);
+        aq.ajax(url, params, JSONObject.class, new AjaxCallback<JSONObject>() {
+
+            @Override
+            public void callback(String url, JSONObject json, AjaxStatus status) {
+                try {
+                    JSONArray jArray  = json.getJSONArray("data");
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+
+                    realm.beginTransaction();
+
+                    for(int i=0;i<jArray.length();i++)
+                    {
+                        Date date_create = dateFormat.parse(jArray.getJSONObject(i).getString("date_create"));
+
+                        jArray.getJSONObject(i).put("date_create",date_create.getTime());
+
+                        realm.createOrUpdateObjectFromJson(Tweet.class, jArray.getJSONObject(i));
+                    }
+                    realm.commitTransaction();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                _listener.callback();
+
+            }
+        });
+        return listTweet;
     }
 
     public interface APIListener{
