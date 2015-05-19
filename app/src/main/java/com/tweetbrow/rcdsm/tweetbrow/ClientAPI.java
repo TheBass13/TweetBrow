@@ -151,7 +151,7 @@ public class ClientAPI {
         realm = Realm.getInstance(context);
 
         aq = new AQuery(context);
-        String url = "http://lyber.local:8888/tweetbrow/timeline";
+        String url = "http://172.31.1.120:8888/tweetbrow/timeline";
 
         Map<String, String> params = new HashMap<String, String>();
         params.put("token", token);
@@ -161,6 +161,7 @@ public class ClientAPI {
             @Override
             public void callback(String url, JSONObject json, AjaxStatus status) {
                 try {
+                    Log.e("LAWL",json.toString());
                     JSONArray jArray  = json.getJSONArray("data");
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 
@@ -171,6 +172,8 @@ public class ClientAPI {
                         Date date_create = dateFormat.parse(jArray.getJSONObject(i).getString("date_create"));
 
                         jArray.getJSONObject(i).put("date_create",date_create.getTime());
+
+                        Log.e("LAWL",jArray.toString());
 
                         realm.createOrUpdateObjectFromJson(Tweet.class, jArray.getJSONObject(i));
                     }

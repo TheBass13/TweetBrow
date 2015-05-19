@@ -15,7 +15,6 @@ import com.tweetbrow.rcdsm.tweetbrow.Adapter.TweetAdapter;
 import com.tweetbrow.rcdsm.tweetbrow.Manager.TweetManager;
 import com.tweetbrow.rcdsm.tweetbrow.Manager.UserManager;
 import com.tweetbrow.rcdsm.tweetbrow.Models.Tweet;
-import com.tweetbrow.rcdsm.tweetbrow.Models.User;
 
 import java.util.ArrayList;
 
@@ -31,12 +30,22 @@ public class MainActivity extends ActionBarActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.news_layout);
+        setContentView(R.layout.main_layout);
 
         tweetList = (ListView)findViewById(R.id.newsList);
         tweet = new TweetManager(this);
 
-        ClientAPI.getInstance().takeTweet(User.getInstance().getToken(),new ClientAPI.APIListener() {
+        SharedPreferences preferences = this.getSharedPreferences("Login", Context.MODE_PRIVATE);
+
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        NewsFragment newsFrag = new NewsFragment();
+        fragmentTransaction.replace(R.id.main_fragment, newsFrag);
+
+        fragmentTransaction.commit();
+
+        ClientAPI.getInstance().takeTweet(preferences.getString("Token", ""), new ClientAPI.APIListener() {
             @Override
             public void callback() {
                 tweets = new ArrayList<Tweet>();
@@ -47,16 +56,6 @@ public class MainActivity extends ActionBarActivity{
             }
         });
         displayUser();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        tweets = new ArrayList<Tweet>();
-        adapter = new TweetAdapter(this,tweets);
-        tweetList.setAdapter(adapter);
-        tweets.clear();
-        tweets.addAll(tweet.allListNote());
     }
 
     @Override
