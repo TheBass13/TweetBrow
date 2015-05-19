@@ -74,10 +74,10 @@ public class ClientAPI {
                     User user = User.getInstance();
                     UserManager userManager = new UserManager(context);
                     try {
+                        user.setToken(json.getJSONObject("data").getString("token"));
                         user.setLogin(json.getJSONObject("data").getString("login"));
                         user.setEmail(json.getJSONObject("data").getString("email"));
                         user.setPseudo(json.getJSONObject("data").getString("pseudo"));
-                        user.setToken(json.getJSONObject("data").getString("token"));
                         userManager.userConnected(user);
 
                         if (preferences.contains("Token") == false) {
@@ -143,7 +143,7 @@ public class ClientAPI {
         });
     }
 
-    public ArrayList<Tweet> takeTweet(APIListener listener){
+    public void takeTweet(APIListener listener){
 
         final ArrayList<Tweet> listTweet = new ArrayList<Tweet>();
         final APIListener _listener = listener;
@@ -154,6 +154,7 @@ public class ClientAPI {
         String url = "http://172.31.1.120:8888/tweetbrow/timeline";
 
         Map<String, String> params = new HashMap<String, String>();
+        System.out.println(User.getInstance().getToken());
         params.put("token", User.getInstance().getToken());
 
         aq.ajax(url, params, JSONObject.class, new AjaxCallback<JSONObject>() {
@@ -186,7 +187,7 @@ public class ClientAPI {
 
             }
         });
-        return listTweet;
+
     }
 
     public interface APIListener{

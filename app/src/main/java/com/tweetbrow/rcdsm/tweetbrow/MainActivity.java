@@ -9,31 +9,18 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ListView;
 
-import com.tweetbrow.rcdsm.tweetbrow.Adapter.TweetAdapter;
-import com.tweetbrow.rcdsm.tweetbrow.Manager.TweetManager;
 import com.tweetbrow.rcdsm.tweetbrow.Manager.UserManager;
-import com.tweetbrow.rcdsm.tweetbrow.Models.Tweet;
-
-import java.util.ArrayList;
 
 
-public class MainActivity extends ActionBarActivity{
+public class MainActivity extends ActionBarActivity {
 
     private UserManager userManag;
-    private ArrayList<Tweet> tweets;
-    private ListView tweetList;
-    private TweetAdapter adapter;
-    private TweetManager tweet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_layout);
-
-        tweetList = (ListView)findViewById(R.id.newsList);
-        tweet = new TweetManager(this);
 
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -43,16 +30,6 @@ public class MainActivity extends ActionBarActivity{
 
         fragmentTransaction.commit();
 
-        ClientAPI.getInstance().takeTweet(new ClientAPI.APIListener() {
-            @Override
-            public void callback() {
-                tweets = new ArrayList<Tweet>();
-                adapter = new TweetAdapter(getApplicationContext(), tweets);
-                tweetList.setAdapter(adapter);
-                tweets.clear();
-                tweets.addAll(tweet.allListNote());
-            }
-        });
         displayUser();
     }
 
@@ -93,7 +70,7 @@ public class MainActivity extends ActionBarActivity{
             editor.clear();
             editor.commit();
 
-            userManag = new UserManager(this);
+            userManag = new UserManager(getApplicationContext());
             userManag.clear();
 
             Intent intent = new Intent(MainActivity.this,LoginActivity.class);

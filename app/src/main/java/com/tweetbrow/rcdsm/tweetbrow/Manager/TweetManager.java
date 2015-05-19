@@ -32,7 +32,7 @@ public class TweetManager {
 
     public ArrayList<Tweet> allListNote(){
         ArrayList<Tweet> items = new ArrayList<Tweet>();
-        RealmResults<Tweet> results = realm.where(Tweet.class).findAllSorted("date_create",RealmResults.SORT_ORDER_DESCENDING);
+        RealmResults<Tweet> results = realm.where(Tweet.class).findAll();
         for(Tweet tweet : results){
             items.add(tweet);
         }

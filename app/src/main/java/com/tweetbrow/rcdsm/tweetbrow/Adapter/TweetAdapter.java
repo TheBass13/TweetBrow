@@ -8,6 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.tweetbrow.rcdsm.tweetbrow.Models.Tweet;
+import com.tweetbrow.rcdsm.tweetbrow.Models.User;
 import com.tweetbrow.rcdsm.tweetbrow.R;
 
 import java.text.SimpleDateFormat;
@@ -28,7 +29,7 @@ public class TweetAdapter extends BaseAdapter {
         this.context = context;
         this.tweets = tweets;
         inflater = LayoutInflater.from(context);
-        format = new SimpleDateFormat("MMMM dd, yyyy hh:mm aa");
+        format = new SimpleDateFormat("MMMM dd, yyyy hh:mm");
     }
 
     @Override
@@ -53,19 +54,19 @@ public class TweetAdapter extends BaseAdapter {
         if(convertView==null) {
             convertView = inflater.inflate(R.layout.tweet_item, null);
             holder = new ViewHolder();
-            holder.login = (TextView) convertView.findViewById(R.id.loginTweet);
-            holder.pseudo = (TextView) convertView.findViewById(R.id.pseudoTweet);
+            holder.login = (TextView) convertView.findViewById(R.id.pseudoTweet);
+            holder.pseudo = (TextView) convertView.findViewById(R.id.loginTweet);
             holder.message = (TextView) convertView.findViewById(R.id.messageTweet);
-            holder.date = (TextView)convertView.findViewById(R.id.dateTweet);
+            holder.date = (TextView) convertView.findViewById(R.id.dateTweet);
             convertView.setTag(holder);
         }
         else {
             holder = (ViewHolder) convertView.getTag();
         }
-        holder.login.setText("TOTO");
-        holder.pseudo.setText("TATA");
+        holder.login.setText("@"+User.getInstance().getLogin());
+        holder.pseudo.setText(User.getInstance().getPseudo());
         holder.message.setText(tweets.get(position).getMessage());
-        holder.date.setText("Last Edited : "+format.format(tweets.get(position).getDate_create()));
+        holder.date.setText(format.format(tweets.get(position).getDate_create()));
 
         return convertView;
     }

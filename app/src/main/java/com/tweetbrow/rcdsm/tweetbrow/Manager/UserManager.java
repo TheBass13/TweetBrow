@@ -22,20 +22,22 @@ public class UserManager {
     public void foundUser(){
         RealmResults<User> results = realm.where(User.class).findAll();
         for(User user : results){
-
             Log.e("YOOOOOOO",user.toString());
             User.getInstance().setPseudo(user.getPseudo());
             User.getInstance().setLogin(user.getLogin());
+            User.getInstance().setToken(user.getToken());
+            Log.e("YOOOOOOO", user.getToken().toString());
         }
     }
 
     public void userConnected(User valueUser){
         realm.beginTransaction();
         User user = realm.createObject(User.class);
+        user.setToken(valueUser.getToken());
         user.setEmail(valueUser.getEmail());
         user.setLogin(valueUser.getLogin());
         user.setPseudo(valueUser.getPseudo());
-        user.setToken(valueUser.getToken());
+        Log.e("AHNIADAHDIIDNA",user.getToken());
         realm.commitTransaction();
     }
 
