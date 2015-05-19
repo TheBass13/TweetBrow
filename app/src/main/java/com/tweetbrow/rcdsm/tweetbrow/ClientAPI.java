@@ -156,7 +156,6 @@ public class ClientAPI {
         Map<String, String> params = new HashMap<String, String>();
         params.put("token", token);
 
-        Log.i("URL",url);
         aq.ajax(url, params, JSONObject.class, new AjaxCallback<JSONObject>() {
 
             @Override

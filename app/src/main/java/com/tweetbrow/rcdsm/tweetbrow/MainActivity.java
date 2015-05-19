@@ -31,15 +31,10 @@ public class MainActivity extends ActionBarActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main_layout);
+        setContentView(R.layout.news_layout);
 
-        FragmentManager fragmentManager = getFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-        NewsFragment news = new NewsFragment();
-        fragmentTransaction.replace(R.id.main_fragment, news);
-
-        fragmentTransaction.commit();
+        tweetList = (ListView)findViewById(R.id.newsList);
+        tweet = new TweetManager(this);
 
         ClientAPI.getInstance().takeTweet(User.getInstance().getToken(),new ClientAPI.APIListener() {
             @Override

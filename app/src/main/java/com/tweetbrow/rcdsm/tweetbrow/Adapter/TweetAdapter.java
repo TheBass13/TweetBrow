@@ -62,10 +62,10 @@ public class TweetAdapter extends BaseAdapter {
         else {
             holder = (ViewHolder) convertView.getTag();
         }
-        /*holder.login.setText(tweets.get(position).getAuthor());
-        holder.pseudo.setText(tweets.get(position).getContent());
-        holder.message.setText(tweets.get(position).getContent());
-        holder.date.setText("Last Edited : "+format.format(notes.get(position).getUpdated_at()));*/
+        holder.login.setText("TOTO");
+        holder.pseudo.setText("TATA");
+        holder.message.setText(tweets.get(position).getMessage());
+        holder.date.setText("Last Edited : "+format.format(tweets.get(position).getDate_create()));
 
         return convertView;
     }
