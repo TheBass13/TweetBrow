@@ -143,7 +143,7 @@ public class ClientAPI {
         });
     }
 
-    public ArrayList<Tweet> takeTweet(String token,APIListener listener){
+    public ArrayList<Tweet> takeTweet(APIListener listener){
 
         final ArrayList<Tweet> listTweet = new ArrayList<Tweet>();
         final APIListener _listener = listener;
@@ -154,7 +154,7 @@ public class ClientAPI {
         String url = "http://172.31.1.120:8888/tweetbrow/timeline";
 
         Map<String, String> params = new HashMap<String, String>();
-        params.put("token", token);
+        params.put("token", User.getInstance().getToken());
 
         aq.ajax(url, params, JSONObject.class, new AjaxCallback<JSONObject>() {
 

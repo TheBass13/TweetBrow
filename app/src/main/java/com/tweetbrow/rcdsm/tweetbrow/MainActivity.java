@@ -35,8 +35,6 @@ public class MainActivity extends ActionBarActivity{
         tweetList = (ListView)findViewById(R.id.newsList);
         tweet = new TweetManager(this);
 
-        SharedPreferences preferences = this.getSharedPreferences("Login", Context.MODE_PRIVATE);
-
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
@@ -45,7 +43,7 @@ public class MainActivity extends ActionBarActivity{
 
         fragmentTransaction.commit();
 
-        ClientAPI.getInstance().takeTweet(preferences.getString("Token", ""), new ClientAPI.APIListener() {
+        ClientAPI.getInstance().takeTweet(new ClientAPI.APIListener() {
             @Override
             public void callback() {
                 tweets = new ArrayList<Tweet>();

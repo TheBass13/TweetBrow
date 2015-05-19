@@ -37,7 +37,7 @@ public class TweetManager {
             items.add(tweet);
         }
 
-        ClientAPI.getInstance().takeTweet(User.getInstance().getToken(),new ClientAPI.APIListener() {
+        ClientAPI.getInstance().takeTweet(new ClientAPI.APIListener() {
             @Override
             public void callback() {
             }

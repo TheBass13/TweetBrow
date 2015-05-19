@@ -35,6 +35,7 @@ public class UserManager {
         user.setEmail(valueUser.getEmail());
         user.setLogin(valueUser.getLogin());
         user.setPseudo(valueUser.getPseudo());
+        user.setToken(valueUser.getToken());
         realm.commitTransaction();
     }
 
