@@ -55,16 +55,23 @@ public class NewsFragment extends Fragment implements AdapterView.OnItemClickLis
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        removeItemFromList(position);
+        removeItemFromList(position,id);
     }
 
-    public void removeItemFromList(int position){
+    public void removeItemFromList(int position,long id){
         final int deletePosition = position;
+        final long modifyId = id;
 
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
         ViewFragment viewTweet = new ViewFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt("login", tweets.get(position).getAuthor());
+       // bundle.putString("pseudo", tweets.get(position).getAuthor());
+        bundle.putString("message", tweets.get(position).getMessage());
+        //bundle.putString("date", tweets.get(position).getAuthor());
+        viewTweet.setArguments(bundle);
         fragmentTransaction.replace(R.id.main_fragment, viewTweet);
 
         fragmentTransaction.commit();
